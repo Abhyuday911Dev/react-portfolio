@@ -1,4 +1,4 @@
-import { Bodies, Engine, Render, World } from "matter-js";
+import { Bodies, Composite, Engine, Render, Runner } from "matter-js";
 import React, { useEffect, useRef } from "react";
 
 const Homepage = () => {
@@ -19,6 +19,9 @@ const Homepage = () => {
         wireframes: false,
       },
     });
+    Render.run(renderRef.current);
+    var runner = Runner.create();
+    Runner.run(runner, engineRef.current);
 
     // Add objects to the world
     var boxA = Bodies.rectangle(400, 200, 80, 80);
@@ -28,16 +31,18 @@ const Homepage = () => {
     });
 
     // add all of the bodies to the world
-    World.add(engineRef.current.world, [boxA, boxB, ground]);
+    Composite.add(engineRef.current.world, [boxA, boxB, ground]);
 
-    // Start the engine and renderer
+    // run the renderer
     Render.run(renderRef.current);
-    Engine.run(engineRef.current);
+
+    // run the engine
+    Runner.run(runner, engineRef.current);
 
     // Cleanup
     return () => {
       Render.stop(renderRef.current);
-      World.clear(engineRef.current.world);
+      Composite.clear(engineRef.current.world);
       Engine.clear(engineRef.current);
       renderRef.current = null;
       engineRef.current = null;
@@ -46,8 +51,8 @@ const Homepage = () => {
 
   return (
     <div id="homepage-main">
-      ppp
       <div ref={sceneRef} />
+      <div id="homepage-main-elelments"></div>
     </div>
   );
 };
