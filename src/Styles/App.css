@@ -5,4 +5,12 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #111;
+}
+
+#homepage-main{
+  height: 100vh;
+  visibility: 100vw;
+  background-color: #1e1e1e;
+  color: #fff;
 }
