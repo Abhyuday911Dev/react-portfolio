@@ -3,6 +3,8 @@ import {
   Composite,
   Constraint,
   Engine,
+  Mouse,
+  MouseConstraint,
   Render,
   Runner,
 } from "matter-js";
@@ -109,10 +111,10 @@ const Homepage = () => {
     Composite.add(engineRef.current.world, [boxA, boxB]);
     Composite.add(engineRef.current.world, [
       // walls
-      Bodies.rectangle(400, 0, 800, 50, { isStatic: true }),
-      Bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
-      Bodies.rectangle(800, 300, 50, 600, { isStatic: true }),
-      Bodies.rectangle(0, 300, 50, 600, { isStatic: true }),
+      //   Bodies.rectangle(400, 0, 800, 50, { isStatic: true }),
+      Bodies.rectangle(w / 2, h, w, 50, { isStatic: true , friction:0.001}),
+      //   Bodies.rectangle(800, 300, 50, 600, { isStatic: true }),
+      //   Bodies.rectangle(0, 300, 50, 600, { isStatic: true }),
     ]);
 
     var scale = 0.9;
@@ -127,6 +129,21 @@ const Homepage = () => {
     // run the engine
     Runner.run(runner, engineRef.current);
 
+    let mouse = Mouse.create(renderRef.current.canvas);
+    let mouseConstraint = MouseConstraint.create(engineRef.current, {
+      mouse: mouse,
+      constraint: { stiffness: 0.01, render: { visible: !1 } },
+    });
+    mouseConstraint.mouse.element.removeEventListener(
+      "mousewheel",
+      mouseConstraint.mouse.mousewheel
+    );
+    mouseConstraint.mouse.element.removeEventListener(
+      "DOMMouseScroll",
+      mouseConstraint.mouse.mousewheel
+    );
+    Composite.add(engineRef.current.world, mouseConstraint);
+
     // Cleanup
     return () => {
       Render.stop(renderRef.current);
@@ -140,7 +157,9 @@ const Homepage = () => {
   return (
     <div id="homepage-main">
       <div ref={sceneRef} />
-      <div id="homepage-main-elelments"></div>
+      <div id="homepage-main-elelments">
+        <h1>Hello white boy</h1>
+      </div>
     </div>
   );
 };
