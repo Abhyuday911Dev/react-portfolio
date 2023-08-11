@@ -10,6 +10,7 @@ import {
 } from "matter-js";
 import Body from "matter-js/src/body/Body";
 import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
 const Homepage = () => {
   const sceneRef = useRef(null);
@@ -19,6 +20,7 @@ const Homepage = () => {
   useEffect(() => {
     let w = window.innerWidth;
     let h = window.innerHeight;
+    let totalSectionWidth = w * 3;
 
     let car = function (xx, yy, width, height, wheelSize) {
       var group = Body.nextGroup(true),
@@ -36,6 +38,7 @@ const Homepage = () => {
             radius: height * 0.5,
           },
           density: 0.0002,
+          friction: 0.001,
         });
 
       var wheelA = Bodies.circle(
@@ -46,7 +49,8 @@ const Homepage = () => {
           collisionFilter: {
             group: group,
           },
-          friction: 0.8,
+          density: 0.0002,
+          friction: 0.001,
         }
       );
 
@@ -58,7 +62,8 @@ const Homepage = () => {
           collisionFilter: {
             group: group,
           },
-          friction: 0.8,
+          density: 0.0002,
+          friction: 0.001,
         }
       );
 
@@ -93,7 +98,7 @@ const Homepage = () => {
       element: sceneRef.current,
       engine: engineRef.current,
       options: {
-        width: window.innerWidth,
+        width: totalSectionWidth,
         height: window.innerHeight,
         background: "transparent",
         wireframes: false,
@@ -104,15 +109,24 @@ const Homepage = () => {
     Runner.run(runner, engineRef.current);
 
     // Add objects to the world
-    var boxA = Bodies.rectangle(400, 200, 80, 80);
-    var boxB = Bodies.rectangle(450, 50, 80, 80);
+    var boxA = Bodies.rectangle(400, 200, 80, 80, {
+      friction: 0.001,
+      density: 0.0002,
+    });
+    var boxB = Bodies.rectangle(450, 50, 80, 80, {
+      friction: 0.001,
+      density: 0.0002,
+    });
 
     // add all of the bodies to the world
     Composite.add(engineRef.current.world, [boxA, boxB]);
     Composite.add(engineRef.current.world, [
       // walls
       //   Bodies.rectangle(400, 0, 800, 50, { isStatic: true }),
-      Bodies.rectangle(w / 2, h, w, 50, { isStatic: true , friction:0.001}),
+      Bodies.rectangle(totalSectionWidth / 2, h, totalSectionWidth, 50, {
+        isStatic: true,
+        friction: 0.001,
+      }),
       //   Bodies.rectangle(800, 300, 50, 600, { isStatic: true }),
       //   Bodies.rectangle(0, 300, 50, 600, { isStatic: true }),
     ]);
@@ -120,8 +134,21 @@ const Homepage = () => {
     var scale = 0.9;
     Composite.add(
       engineRef.current.world,
-      car(150, 100, 150 * scale, 30 * scale, 30 * scale)
+      car(150, 100, 290 * scale, 25 * scale, 30 * scale)
     );
+
+    // apply force
+    // var forceMagnitude = 0.5;
+    // var constantForce = { x:forceMagnitude , y: 0.0 };
+    // Body.applyForce(boxA, boxA.position, constantForce);
+
+    //apply linear valocity
+    var velocity = { x: 1.5, y: 1 };
+    let velocityInterval =setInterval(() => {
+      Body.setVelocity(boxA, velocity);
+    }, 200);
+
+    // clear the fucking timeinterval in the callback when you wake up
 
     // run the renderer
     Render.run(renderRef.current);
@@ -146,6 +173,7 @@ const Homepage = () => {
 
     // Cleanup
     return () => {
+      clearInterval(velocityInterval);
       Render.stop(renderRef.current);
       Composite.clear(engineRef.current.world);
       Engine.clear(engineRef.current);
@@ -159,6 +187,7 @@ const Homepage = () => {
       <div ref={sceneRef} />
       <div id="homepage-main-elelments">
         <h1>Hello white boy</h1>
+        <Link to="/profile">To Profil Page</Link>
       </div>
     </div>
   );
